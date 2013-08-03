@@ -123,117 +123,117 @@
 
   $(document).ready(function() {
 
-  window.AlbumView = Backbone.View.extend({
-    template : _.template($('#album-template').html()),
-    tag: 'li',
-    className: 'album',
+    window.AlbumView = Backbone.View.extend({
+      template : _.template($('#album-template').html()),
+      tag: 'li',
+      className: 'album',
 
-    initialize: function(){
-      _.bindAll(this, 'render');
-      this.model.bind('change', this.render);
+      initialize: function(){
+        _.bindAll(this, 'render');
+        this.model.bind('change', this.render);
 
-    },
+      },
 
-    render: function(){
-      var renderedContent = this.template(this.model.toJSON());
-      $(this.el).html(renderedContent);
-      return this;
-    }
-  });
+      render: function(){
+        var renderedContent = this.template(this.model.toJSON());
+        $(this.el).html(renderedContent);
+        return this;
+      }
+    });
 
-  window.LibraryAlbumView = AlbumView.extend({
-    events: {
-      'click .queue.add': 'select'
-    },
+    window.LibraryAlbumView = AlbumView.extend({
+      events: {
+        'click .queue.add': 'select'
+      },
 
-    select: function() {
-      this.collection.trigger('select',  this.model);
-      console.log('Triggered select', this.model);
-    }
+      select: function() {
+        this.collection.trigger('select',  this.model);
+        console.log('Triggered select', this.model);
+      }
 
-  });
+    });
 
-  window.PlaylistAlbumView = AlbumView.extend({
-    events: {
-      'click .queue.remove': 'removeFromPlaylist'
-    },
+    window.PlaylistAlbumView = AlbumView.extend({
+      events: {
+        'click .queue.remove': 'removeFromPlaylist'
+      },
 
-    initialize: function() {
-      _.bindAll(this, 'render', 'remove');
-      this.model.bind('remove', this.remove);
-    },
+      initialize: function() {
+        _.bindAll(this, 'render', 'remove');
+        this.model.bind('remove', this.remove);
+      },
 
-    removeFromPlaylist: function() {
-      console.log("Removing", this.model);
-      this.options.playlist.remove(this.model);
-    }
-  });
+      removeFromPlaylist: function() {
+        console.log("Removing", this.model);
+        this.options.playlist.remove(this.model);
+      }
+    });
 
-  window.PlaylistView = Backbone.View.extend({
-    tag:   'section',
-    className: 'playlist',
+    window.PlaylistView = Backbone.View.extend({
+      tag:   'section',
+      className: 'playlist',
 
-    initialize: function() {
-      _.bindAll(this, 'render', 'renderAlbum' ,'queueAlbum');
-      this.template = _.template($('#playlist-template').html());
-      this.collection.bind('reset', this.render);
-      this.collection.bind('add', this.renderAlbum);
+      initialize: function() {
+        _.bindAll(this, 'render', 'renderAlbum' ,'queueAlbum');
+        this.template = _.template($('#playlist-template').html());
+        this.collection.bind('reset', this.render);
+        this.collection.bind('add', this.renderAlbum);
 
-      this.player = this.options.player;
-      this.library = this.options.library;
-      this.library.bind('select', this.queueAlbum);
+        this.player = this.options.player;
+        this.library = this.options.library;
+        this.library.bind('select', this.queueAlbum);
 
-    },
+      },
 
-    render: function() {
-      $(this.el).html(this.template(this.player.toJSON()));
+      render: function() {
+        $(this.el).html(this.template(this.player.toJSON()));
 
-      this.$('button.play').toggle(this.player.isStopped());
-      this.$('button.pause').toggle(this.player.isPlaying());
+        this.$('button.play').toggle(this.player.isStopped());
+        this.$('button.pause').toggle(this.player.isPlaying());
 
-      return this;
-    },
+        return this;
+      },
 
-    renderAlbum: function(album) {
-      var view = new PlaylistAlbumView({
-        model: album,
-        player: this.player,
-        playlist: this.collection
-      });
-      this.$('ul').append(view.render().el);
-    },
-
-    queueAlbum: function(album) {
-      this.collection.add(album);
-    }
-  });
-
-  window.LibraryView = Backbone.View.extend({
-    tagName: 'section',
-    className: 'library',
-
-    initialize: function(){
-      _.bindAll(this, 'render');
-      this.template = _.template($('#library-template').html());
-      this.collection.bind('reset', this.render);
-    },
-
-    render: function(){
-      var $albums,
-          collection = this.collection;
-
-      $(this.el).html(this.template({}));
-      $albums = this.$('.albums');
-      collection.each(function(album){
-        var view = new LibraryAlbumView({
+      renderAlbum: function(album) {
+        var view = new PlaylistAlbumView({
           model: album,
-          collection: collection
+          player: this.player,
+          playlist: this.collection
         });
-        $albums.append(view.render().el);
-      });
-      return this;
-    }
-  });
+        this.$('ul').append(view.render().el);
+      },
+
+      queueAlbum: function(album) {
+        this.collection.add(album);
+      }
+    });
+
+    window.LibraryView = Backbone.View.extend({
+      tagName: 'section',
+      className: 'library',
+
+      initialize: function(){
+        _.bindAll(this, 'render');
+        this.template = _.template($('#library-template').html());
+        this.collection.bind('reset', this.render);
+      },
+
+      render: function(){
+        var $albums,
+            collection = this.collection;
+
+        $(this.el).html(this.template({}));
+        $albums = this.$('.albums');
+        collection.each(function(album){
+          var view = new LibraryAlbumView({
+            model: album,
+            collection: collection
+          });
+          $albums.append(view.render().el);
+        });
+        return this;
+      }
+    });
   });
 
   window.BackboneTunes = Backbone.Router.extend({
