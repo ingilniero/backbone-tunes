@@ -121,7 +121,10 @@
   window.library = new Albums();
   window.player = new Player();
 
+  $(document).ready(function() {
+
   window.AlbumView = Backbone.View.extend({
+    template : _.template($('#album-template').html()),
     tag: 'li',
     className: 'album',
 
@@ -129,7 +132,6 @@
       _.bindAll(this, 'render');
       this.model.bind('change', this.render);
 
-      this.template = _.template($('#album-template').html());
     },
 
     render: function(){
@@ -151,19 +153,36 @@
 
   });
 
-  window.PlaylistAlbumView = AlbumView.extend({});
+  window.PlaylistAlbumView = AlbumView.extend({
+    events: {
+      'click .queue.remove': 'removeFromPlaylist'
+    },
+
+    initialize: function() {
+      _.bindAll(this, 'render', 'remove');
+      this.model.bind('remove', this.remove);
+    },
+
+    removeFromPlaylist: function() {
+      console.log("Removing", this.model);
+      this.options.playlist.remove(this.model);
+    }
+  });
 
   window.PlaylistView = Backbone.View.extend({
     tag:   'section',
     className: 'playlist',
 
     initialize: function() {
-      _.bindAll(this, 'render');
+      _.bindAll(this, 'render', 'renderAlbum' ,'queueAlbum');
       this.template = _.template($('#playlist-template').html());
       this.collection.bind('reset', this.render);
+      this.collection.bind('add', this.renderAlbum);
 
       this.player = this.options.player;
       this.library = this.options.library;
+      this.library.bind('select', this.queueAlbum);
+
     },
 
     render: function() {
@@ -173,6 +192,19 @@
       this.$('button.pause').toggle(this.player.isPlaying());
 
       return this;
+    },
+
+    renderAlbum: function(album) {
+      var view = new PlaylistAlbumView({
+        model: album,
+        player: this.player,
+        playlist: this.collection
+      });
+      this.$('ul').append(view.render().el);
+    },
+
+    queueAlbum: function(album) {
+      this.collection.add(album);
     }
   });
 
@@ -201,6 +233,7 @@
       });
       return this;
     }
+  });
   });
 
   window.BackboneTunes = Backbone.Router.extend({
