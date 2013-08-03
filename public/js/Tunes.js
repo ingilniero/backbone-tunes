@@ -172,10 +172,10 @@
     window.PlaylistView = Backbone.View.extend({
       tag:   'section',
       className: 'playlist',
+      template: _.template($('#playlist-template').html()),
 
       initialize: function() {
         _.bindAll(this, 'render', 'renderAlbum' ,'queueAlbum');
-        this.template = _.template($('#playlist-template').html());
         this.collection.bind('reset', this.render);
         this.collection.bind('add', this.renderAlbum);
 
@@ -211,10 +211,10 @@
     window.LibraryView = Backbone.View.extend({
       tagName: 'section',
       className: 'library',
+      template: _.template($('#library-template').html()),
 
       initialize: function(){
         _.bindAll(this, 'render');
-        this.template = _.template($('#library-template').html());
         this.collection.bind('reset', this.render);
       },
 
