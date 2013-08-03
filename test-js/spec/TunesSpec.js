@@ -77,3 +77,62 @@ describe("Playlist", function() {
     expect(this.playlist.isLastAlbum(0)).toBeFalsy();
   });
 });
+
+describe("Player", function() {
+
+  describe("with no items", function() {
+
+    beforeEach(function() {
+      this.player = new Player();
+    });
+
+    it("starts with album 0", function() {
+      expect(this.player.get('currentAlbumIndex')).toEqual(0);
+    });
+
+    it("starts with track 0", function() {
+      expect(this.player.get('currentTrackIndex')).toEqual(0);
+    });
+
+    describe("with added album", function() {
+      beforeEach(function() {
+        this.player = new Player();
+        this.player.playlist.add(albumData[0]);
+      });
+
+      it("is in 'stop' state", function() {
+        expect(this.player.get('state')).toEqual('stop');
+      });
+
+      it("is stopped", function(){
+        expect(this.player.isStopped()).toBeTruthy();
+      });
+
+      describe("while playing", function(){
+
+        beforeEach(function() {
+          this.player.play();
+        });
+
+        it("sents to 'play' state", function() {
+          expect(this.player.get('state')).toEqual('play');
+        });
+
+        it("is playing", function() {
+          expect(this.player.isPlaying()).toBeTruthy();
+        });
+
+        it("as a current album", function() {
+          expect(this.player.currentAlbum().get('title'))
+            .toEqual('Album A');
+        });
+
+        it("has a current track URL", function() {
+          expect(this.player.currentTrackUrl())
+            .toEqual("/music/Album A Track A.mp3");
+        });
+      });
+    });
+  });
+
+});
