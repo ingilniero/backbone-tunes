@@ -23,6 +23,18 @@
     url: '/albums'
   });
 
+  window.Playlist = Albums.extend({
+
+    isFirstAlbum: function(index) {
+      return index == 0;
+    },
+
+    isLastAlbum: function(index) {
+      return index == this.models.length -1;
+    }
+
+  });
+
   window.library = new Albums();
 
   window.AlbumView = Backbone.View.extend({
